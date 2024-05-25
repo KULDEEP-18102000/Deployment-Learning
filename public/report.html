@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <div id="container">
+        <h4>Download Your Report</h4>
+
+        <Button style="margin: 10px;" id="download">Download</Button>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+
+    <script src="report.js"></script>
+
+    <script>
+
+        document.getElementById('download').onclick = async function () {
+            console.log("clicked")
+            const token = localStorage.getItem('token')
+            const response = await axios.get('http://3.109.32.194:3000/user/download', { headers: { "Authorization": token } })
+            if (response.status === 201) {
+                const a = document.createElement('a')
+                a.href = response.data.fileURl
+                a.download = 'myexpense.csv'
+                a.click()
+                getallfiles()
+                // document.body.innerHTML=document.body.innerHTML+`<h5>${response.data.fileURl}</h5>`
+            } else {
+                throw new Error(response.data.message)
+            }
+        }
+
+        const getallfiles = async () => {
+            const token = localStorage.getItem('token')
+            const files = await axios.get('http://3.109.32.194:3000/user/getallfiles', { headers: { "Authorization": token } })
+            for (let i = 0; i < files.data.length; i++) {
+                let file = files.data[i]
+                document.body.innerHTML = document.body.innerHTML + `<h5>${file.fileURl}-${file.createdAt}</h5>`
+            }
+            console.log(files)
+        }
+
+        // window.addEventListener("DOMContentLoaded", getallfiles())
+
+    </script>
+
+</body>
+
+</html>

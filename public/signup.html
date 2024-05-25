@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up for expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="container">
+    <form  id="my-form">
+  <label for="name"><b>Name:</b> </label><br>
+  <input type="text" id="name" name="name"><br>
+  <label for="email"><b>Email</b> </label><br>
+  <input type="email" id="email" name="email"><br>
+  <label for="password"><b>Password</b> </label><br>
+  <input type="password" id="password" name="password"><br>
+  <button class="btn" type="submit">sign up</button>
+
+  <div>
+    <a href="\login.html">login here</a>
+</div>
+</form>
+</div>
+<script>
+    const username=document.getElementById('name')
+const useremail=document.getElementById('email')
+const userpassword=document.getElementById('password')
+
+document.getElementById('my-form').addEventListener('submit',onSubmit);
+
+async function onSubmit(e){
+    e.preventDefault();
+    my_obj={
+        name:username.value,
+        email:useremail.value,
+        password:userpassword.value
+    }
+    const response=await axios.post('http://3.109.32.194:3000/user/signup',my_obj)
+    if(response.data.message=="user already exists"){
+        document.body.innerHTML=document.body.innerHTML+'<h3>User already exists</h3>'
+    }else{
+        window.location.href='./login.html'
+    }
+    console.log(response)
+    username.value=""
+    useremail.value=""
+    userpassword.value=""
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+</body>
+</html>
