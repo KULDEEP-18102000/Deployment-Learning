@@ -1,0 +1,47 @@
+Deploying NodeJS application with MySQL as a database
+
+1)Maintain a Dot env file where we will have to declare all the input values which we will be passing while connecting to mysql.
+
+2)For node app with mysql, we will have to build image and container using docker yml file only.
+
+3)In yml file, we will have to extensively define mysql as a service
+
+4) In a Docker Compose setup, services are isolated from the host network by default and use the Docker network to communicate with each other. Therefore, your Node.js application should connect to the MySQL service using the service name defined in the docker-compose.yml file(mysql), not 127.0.0.1(localhost).
+
+5)So we will have to again define environments variables for mysql in yml file.so when node app will be running in container it will take environment values from yml file instead of from dot env file. So in yml file we will define host as mysql instead of localhost.
+
+6)So when we will run node app locally from vs code, while connecting to mysql, it will take input parameters values from local dot env file but when we will be running node app in container, while connecting to mysql database, it will take input parameters values from environment variables defined in compose yml file.
+
+7)Example of yml file below:-
+
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mysql
+      - DB_USERNAME=root
+      - PASSWORD=example
+      - DB_NAME=expense
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      PASSWORD: example
+      DB_NAME: expense
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
+
+8)Command for building a image and running a container with that image
+Docker-compose up
