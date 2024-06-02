@@ -1,0 +1,327 @@
+Deploying Node js app to AWS
+
+1)What is a server:-
+a)Like our laptop
+b)Linux os or ubuntu os
+c)Just a terminal where we can run a code
+d)we open up ports of that server(Configured from AWS website)
+
+2)Made a account on aws website
+3)AWS Free tier
+4)Make Backend ready(move all secrets to dot env file)
+5)AWS – Buy a server
+6)Running a sql server on different server
+6)Configure the server
+  a)Install node
+  b)Install sql server
+  c)Install Git
+7)Get the code from github and clone it
+8)Run the backend
+
+
+Launching the EC2 instance
+
+1)Sign in from root user account
+2)Search for EC2
+3)Click on launch instance button
+4)Select free tier server from available options and go inside
+5)By Default, free tier will be selected then go for “Next configure instance details”. 
+6)Then go for “Add tags”
+7)Then go for “Configuring security group”
+
+
+
+
+
+Purpose of security Group
+
+
+1.	Traffic Control:
+•	Inbound Rules: Define which incoming traffic is allowed to reach the EC2 instance. For example, you can allow HTTP traffic on port 80, HTTPS traffic on port 443, or SSH traffic on port 22 from specific IP addresses or ranges.
+•	Outbound Rules: Define which outgoing traffic from the EC2 instance is allowed. This can be used to restrict the instance from accessing certain IP addresses or ports on the internet or within your VPC.
+2.	Stateful Nature:
+•	Security Groups are stateful. This means that if you allow an incoming request from an IP address on a specific port, the response is automatically allowed to flow out, regardless of outbound rules. Conversely, if outbound traffic is allowed, the response to that traffic is automatically allowed back in.
+3.	Isolation and Security:
+•	Security Groups help in isolating EC2 instances by allowing you to define different sets of rules for different instances. This isolation is crucial for maintaining security boundaries within your AWS environment.
+4.	Dynamic Management:
+•	Security Group rules can be modified at any time, and the changes take effect immediately. This allows you to dynamically manage the access to your instances without needing to restart them.
+5.	Specificity:
+•	Security Groups allow specifying traffic rules with a high level of detail, including protocols (TCP, UDP, ICMP), port ranges, and source/destination IP addresses or CIDR blocks.
+6.	Integration with VPC:
+•	Security Groups are used within a Virtual Private Cloud (VPC) and can be attached to multiple instances within the VPC. They help control traffic between instances in the same VPC or different VPCs connected via VPC peering.
+Example Use Cases
+1.	Web Server Access:
+•	Allow inbound HTTP (port 80) and HTTPS (port 443) traffic from the internet (0.0.0.0/0) to an EC2 instance running a web server.
+2.	SSH Access:
+•	Allow inbound SSH (port 22) traffic only from a specific IP address or range, ensuring that only trusted sources can access the instance via SSH.
+3.	Database Server:
+•	Allow inbound MySQL (port 3306) traffic only from instances within the same VPC or a specific subnet, thereby restricting database access to certain application servers.
+4.	Load Balancer:
+•	Allow traffic from an AWS Elastic Load Balancer (ELB) to the EC2 instances it distributes traffic to, ensuring that only the ELB can communicate with the instances.
+Example Security Group Configuration
+Suppose you have a web server and a database server. Here's a simplified configuration:
+•	Web Server Security Group:
+•	Inbound Rules:
+•	HTTP: Allow from 0.0.0.0/0 (all IP addresses)
+•	HTTPS: Allow from 0.0.0.0/0 (all IP addresses)
+•	SSH: Allow from a specific IP address (e.g., your office IP)
+•	Outbound Rules:
+•	Allow all outbound traffic (default rule)
+•	Database Server Security Group:
+•	Inbound Rules:
+•	MySQL: Allow from the web server's Security Group
+•	Outbound Rules:
+•	Allow all outbound traffic (default rule)
+Security Group Configuration in AWS Console
+1.	Create Security Group:
+•	Navigate to the EC2 Dashboard.
+•	Click on "Security Groups" under "Network & Security."
+•	Click "Create Security Group."
+•	Provide a name and description, select the VPC, and define the inbound and outbound rules.
+2.	Attach Security Group to EC2 Instance:
+•	When launching an instance, you can select the security group in the "Configure Security Group" step.
+•	For an existing instance, you can modify the security groups by selecting the instance, clicking "Actions," then "Networking," and "Change Security Groups."
+
+
+
+
+8)Then in configure security group step
+   a)we can create new security group or we can use existing one if already created before
+   b)Two column :- Port Range(defines which port of ec2 instance will be open) and source(defines from where and all ec2 instance can accept the request) then go for review and launch button.
+9)In final, review instance launch step, two options will be there, a)create a new key pair and b)use an existing key pair
+10)Above key pair generated password in downloaded file will be used while logging in to ec2 instance so note it carefully(we can download also at that time)
+11)In terminal, Change directory to go to folder where we have saved a aws credential basically we have downloaded a key pair in step 10(that will be a pm file)
+
+12)Go to instances in ec2 dashboard and then connect and enter username and then go to ssh client(From ssh client option we will get the ssh command to connect to that ec2 instance)
+
+13)Before ssh command, we will need to run a command for make password pen file readable by using a command – sudo chmod 400 “pen filename” then run ssh command mentioned in ssh client option.
+
+14)After running above command we will get into ec2 instance terminal
+
+Install Node on EC2 Server
+15)Run sudo su command to become the root user
+16)Then run a command for getting a package for node on ec2
+curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
+17)After following above command
+Sudo yum install -y nodejs
+Installing Git on EC2
+18)Run this command in ec2 terminal
+Sudo yum install git -y
+19)clone the app inside ec2 using command
+Git clone “https url”
+20)Different linux commands
+  a)ls to find child directories of present working directory
+  b)pwd to find present working directory
+  c)mkdir “directory name” to make new directory
+  d)rm -rf “directory name”
+  e)vi “filename” to open particular file in ec2 terminal then “i” to enable editing then esc+w+q to escape after editing is done. We can also excape by :wq! then enter.
+  f)git branch -a to check all branches for that app pulled from github
+ g)git checkout “branchname” to go inside particular branch
+h)sudo su to become the root user
+i)source .env to initialize all environmental variables in terminal
+j)lsof -i :3000 to see all the processes running on port 3000.
+k)kill “processid” will kill the process with that particular process id on port 3000.
+21)Run npm i command to install everything
+
+Why we don’t host database on same ec2 server
+1)We have opened some ports on ec2 server so through that opened ports database can get hacked
+2)RDS server specially made for hosting database is much faster than ec2
+3)Regular backup of data is also maintained on RDS
+
+Continuing from step 21
+22)Go to RDS dashboard inside AWS
+23)Go for create database option
+24)Go for mysql option, then go for free tier, then give username, password and make a note of these two things(username and password) and then we may disable autoscaling checkbox
+25)Give a new vpc security group name by this we will open one port on this RDS server and then we will connect that port to ec2 server
+26)In credential setting, give a master username and password and make a note of it and then create a database.
+Connecting EC2 and RDS
+27)Now to connect RDS to ec2, In RDS security group we will have to allow database to connect to ec2 instance. How we will do -> we will go inside that database
+28)Go inside VPC security groups field value link which will be present in connectivity and security section
+29)Go to inbound rules section, click on edit inbound rules and go inside
+30)In type column select mysql aurora and in source column choose custom and then in search box next to source column, search for security group which you have given for your ec2 instance so that by connecting both security groups of ec2 and RDS, RDS will connect to ec2. Finally save the rules
+
+Connecting to RDS mysql server from local system workbench
+31)Open workbench and type the connection name. Then in connection method by default standard(TCP/IP) will be selected, we will have to choose standard TCP/IP over SSH.
+32)Then in ssh hostname, put ec2 ip address followed by port which was opened in ec2 security group. Ex:- 3.84.55.5:22. You may take ip from ssh command which we use to connect to ec2 terminal.
+33)For ssh username, take ec2 username from ssh command.
+34)In ssh key file, choose aws credential pen file which has been downloaded in step 10.
+35)Go to that particular db instance in RDS dashboard and go inside where we will get the Endpoint and port of that particular db instance.
+36)Put above Endpoint as a mysql hostname and port as a mysql server port
+37)Put username and password which we have got from step 26 and go inside, then create the schema.
+38)Open the env file in ec2 terminal and then edit the hostname, username, password and db name values.
+39)Now run the app and everything should work now.
+40)Go inside security group of ec2 instance and go for edit inbound rules, add port 3000 so that we can access app from port 3000(port range-3000 and source-0.0.0.0 so that from anywhere we will able to access)
+41)Change from localhost ip address to ec2 instance ip address.
+
+Why to use pm2 instead of simple npm start or node index.js
+1)If we use npm start or node index.js, In case if we kill the terminal then app backend will also stop working. So usually in companies, because  they maintain lot of servers so very often they used to kill the terminals so by killing terminal server should not stop responding to requests that’s why they uses pm2 so if they kill the terminal also server will not stop responding to request it will be still on.
+2)By using pm2, we can see the logs
+3)we can see the status also for all applications running on same server
+4)We can Configure pm2 to restart node service on server restart
+5)We can schedule a job which runs at particular time at every interval
+Continuing from step 41
+
+42)Install pm2 on local system by running a command:-
+npm i -g pm2
+command for starting app:-
+pm2 start app.js
+command for see logs:-
+Pm2 logs
+Command for see status:-
+Pm2 status
+Command for stopping all processes:-
+pm2 stop all
+command for stopping process with particular id:-
+pm2 stop “processid”
+43)Install pm2 on ec2 instance also
+44)To start app on ec2 instance run command
+sudo pm2 start app.js
+
+
+
+Why to use NGINX
+1)By default http runs on port no 80 and https runs on port no 443.
+2)Port no 80 and port no 443 are very much secure by default compared to other ports.
+3)Whenever we hit requests on port 80 while using http, port will get hide only ip will remain  visible similarly in case of https, if we hit request on port no 443, port will get hide only ip will remain visible so they are very much built in to be a secured port.
+4)Nginx can reverse all requests from defined port(ex:-3000) to a port no 80 incase of http and to a port 443 incase of https. So we will not have to expose port while requesting which will make our app very much secure. So we can hit on port no 80 or 443 depending on http or https then it will automatically send those request to defined hidden port(ex:-3000) so port will never expose publically.
+Continuing from step 44
+
+45)Run below command to check wheather nginx exists or not
+sudo amazon-linux-extras list | grep nginx
+46)Command for enabling nginx
+sudo amazon-linux-extras enable nginx1
+47)Now we can install nginx by running following commands
+sudo yum clean metadata
+sudo yum -y install nginx
+nginx -v
+last command to check whether nginx installed or not
+
+Configuring nginx for a reverse proxy from port no 3000 to port 80
+
+48)Check current working directory by running a command – pwd(anyhow we have to reach etc folder)
+49)Run command cd../ to go to home folder then again do cd../  to reach two step back and then run command ls to check whether etc is present is pwd or not if present then go inside by “cd etc”
+50)Then go inside nginx by running command cd nginx
+51)command to check status of nginx
+systemctl status nginx
+52)In the nginx config, we want that whenever any traffic comes to port 80, we want it to divert to some other port and get response from their.
+53)We will be going to etc folder by running command cd../../etc
+54)Inside etc folder, we will be going inside nginx
+cd nginx/
+55)Open port 80 by going to ec2 dashboard of that instance, then go inside security group, then edit inbound rules, add rule then choose HTTP in type column, automatically 80 will come in port range. Finally save the rules.
+56)After opening port 80, if we will give http request to port 80, default html file will come. We can also open and edit this default html file.
+57)Go inside conf.d by running command 
+cd conf.d/
+58)We will create a new conf file inside conf.d by running a command
+sudo vi expensetracker.conf
+59)Put inside new conf file
+server {
+   listen         80 default_server;
+   listen         [::]:80 default_server;
+   server_name    localhost;
+   root           /usr/share/nginx/html;location / {
+       proxy_pass http://127.0.0.1:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+   }
+}
+
+60)After putting above thing save by :wq!
+61)Now restart nginx service by running command
+Sudo service nginx restart
+Now when you will hit port 80, request will pass to 3000
+62)What happens if we turn off AWS server->
+For free tier-> that ip address will allocate to someone else and when we will again come, we will get new ip address and again we will have to do configuration for new ip address but if we buy aws server then that ip address will always reserved for us.
+63)We can buy a domain for our ip from namecheap.com
+64)Why we need CICD and Jenkins ->
+Without this, First we need to push the code to git
+Second we need to ssh into ec2 server then third we will need to pull from git then finally we will have to again restart the server with latest changes but if we will be having cicd and Jenkins, we can push the code to git and then ec2 server will directly take that code from git through Jenkins connected in between and re-run the server with latest changes so it will automate the deployment.
+
+
+
+
+Installing and accessing Jenkins UI
+65)To ensure software packages are up to date on the instance
+sudo yum update -y
+66)Add the Jenkins repo using below command
+[ec2-user ~]$ sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+67)we can use ctrl+d command to come out of sudo user
+68) Import a key file from Jenkins-CI to enable installation from the package:
+[ec2-user ~]$ sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+Then
+[ec2-user ~]$ sudo yum upgrade
+69)Now Jenkins uses java as well
+[ec2-user ~]$ sudo dnf install java-17-amazon-corretto -y
+sudo amazon-linux-extras install java-openjdk11 -y
+70)Now Install Jenkins
+[ec2-user ~]$ sudo yum install jenkins -y
+Maybe above command for installing Jenkins will fail so run below command
+sudo amazon-linux-extras install epel -y
+now again try installing Jenkins
+sudo yum install jenkins -y
+71) Enable the Jenkins service to start at boot:
+[ec2-user ~]$ sudo systemctl enable jenkins
+
+72) Start Jenkins as a service:
+[ec2-user ~]$ sudo systemctl start jenkins
+
+73)Now You can check the status of the Jenkins service using the command:
+[ec2-user ~]$ sudo systemctl status jenkins
+To check whether Jenkins running or not in ec2 instance
+Now above was the installation part but for configuring the Jenkins we have to use the Jenkins UI.
+
+Jenkins is now installed and running on your EC2 instance. To configure Jenkins:
+74) Connect to http://<your_server_public_DNS>:8080 from your browser. You will be able to access Jenkins through its management interface(ex:-3.84.55.5:8080)
+75)But may port no 8080 will be closed so we will have to open port no 8080 from security group of ec2 instance.(edit inbound rules-> custom tcp->8080->0.0.0.0)
+76)Now a Jenkins UI will come where we will have to put a administrator password(Note down this administrator password)
+77)To get above administrator password, Go to /var/lib/jenkins/secrets/initialAdminPassword
+In terminal by sudo vi /var/lib/jenkins/secrets/initialAdminPassword
+Get password and put in jenkins ui as administrator password
+
+Configure Jenkins with Git Git Creds
+78)Go for install suggested plugins option
+79)Now create a admin user by putting username and password(make note of this everything because later it will be used for logging in to jenkins) then continue and finish.
+80)Then in Jenkins UI,
+1) Go to Dashboard->Credentials->System->Global credentials(unrestricted)
+2)Go for Add Credential option
+3)Now Jenkins should be able to connect to git so put git credentials over there. (first choose username with password option in kind dropdown option)and finally save it.
+4)Go for new item option in main dashboard, enter item name and create.
+5)Now in source code management, choose Git option and put repository url, and choose credentials in credentials field.
+6)Put branch name in branch specifier field(ex:- */master) and save.
+7)Now click on build now menu to import code in Jenkins from git
+8)Now project with specified item name will appear below list of menu’s. Go inside that project.
+8)Now Jenkins is saving the code somewhere but we don’t know where its saving but we want it to save at specific place so select custom workspace option checkbox and put the name of specified directory location where you want to put code(ex:-/home/ec2-user/JenkinsExpenseTracker) and save it.
+9)Now click on build now menu again to build the code at specified directory location.
+Maybe build will fail so make directory first and push to git and pull to ec2 instance and then try again
+
+Configure Jenkins UI to pull from GIT
+10)Go to Dashboard->Credentials->System->Global credentials(unrestricted)
+11)Go for add credentials option then choose username with password option then put github username and password over there then save.After saving it will get saved in global credentials(unrestricted)
+12)Now in Jenkins dashboard, create a job option will be coming( if not logout and login) so go for it.
+Enter Item name and ok then same step same as 5,6 and 7.
+13)Now click on build submenu to build
+14)Now go to location where Jenkins has build the project in your ec2 instance by cd /var/lib/Jenkins/workspace
+15)now ls to see child directories(ex:-expensetracker)and go inside by cd expensetracker
+
+Running code automatically after importing code from git via Jenkins
+
+16)When through build, updated code from git will come to ec2 instance then we will have to stop ec2 server and do npm i to get updated packages and then again start ec2 server so that updated changes in code will reflect in ec2 server app but this stopping and restarting of server should be also automatic and it should be a part of build.
+17)List of commands:-
+ a)sudo npm install --unsafe-perm=true –allow-root
+b)sudo pm2 stop all(sudo necessary)
+c)sudo pm2 start app.js
+18)Now inside dashboard->project(expensetracker)->Go for Add Build step->
+Execute shell->Now put above list of commands in shell mentioned in step 17 then save it.
+19)Now we can check in configure whether commands saved properly or not.
+20)If properly saved then go for build now.
+Maybe the above build will get fail so because Jenkins will be not having all the access so we will have to give Jenkins all the access by doing some configuration in ec2.(In step21)
+21)run command sudo visudo to open the configuration file of sudo. Inside this file, type “i” for inserting. Go to last line then insert this line ->
+Jenkins All=(All) NOPASSWD: ALL
+Save above line by :wq
+22)We should not go again and again to Jenkins and clicking on button build instead jenkins should watch for new builds, as soon new builds comes, Jenkins should automatically build it. So for achieve that go to dashboard->project name(ex:-expenseTracker) then in build triggers section choose poll SCM then give cron expression in schedule textfield then save it.
+
+
+
